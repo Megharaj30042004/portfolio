@@ -105,3 +105,45 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 });
+
+// --- 4. Web3Forms Background Submission Logic ---
+const form = document.getElementById('contactForm');
+const successMessage = document.getElementById('successMessage');
+
+if (form) {
+    form.addEventListener('submit', function(e) {
+        // Prevent the default form submission (stops the page from redirecting!)
+        e.preventDefault();
+
+        // Grab all the data the user typed in
+        const formData = new FormData(form);
+        const object = Object.fromEntries(formData);
+        const json = JSON.stringify(object);
+
+        // Send the data to Web3Forms in the background
+        fetch('https://api.web3forms.com/submit', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: json
+        })
+        .then(async (response) => {
+            if (response.status == 200) {
+                // If successful, hide the form and show your custom message!
+                form.classList.add('opacity-0', 'pointer-events-none');
+                setTimeout(() => {
+                    form.classList.add('hidden');
+                    successMessage.classList.remove('hidden');
+                    successMessage.classList.add('fade-in-up');
+                }, 300);
+            } else {
+                console.log("Error sending message.");
+            }
+        })
+        .catch(error => {
+            console.log(error);
+        });
+    });
+}
